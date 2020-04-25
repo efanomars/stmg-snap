@@ -1,0 +1,23 @@
+#snapcraft specifics
+/parts/
+/stage/
+/prime/
+
+*.snap
+
+.snapcraft
+__pycache__
+*.pyc
+*_source.tar.bz2
+snap/.snapcraft
+
+*.tar.gz
+jointris/
+swapper/
+mynes/
+stmm-games/
+stmm-input/
+stmm-input-au/
+stmm-input-bt/
+stmm-input-xi/
+

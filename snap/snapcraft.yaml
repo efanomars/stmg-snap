@@ -1,0 +1,516 @@
+# Official release version from efanomars.con website
+
+name: stmg
+
+summary: Bundle containing jointris, swapper and mynes games.
+
+#version: "latest"
+adopt-info: jointris # part setting the version to current time
+
+description: |
+  Jointris - Join blocks on the fly with bombs
+  Swapper - Swap tiles to remove them
+  Mynes - scrolling minesweeper with sonars and islands
+  - joysticks
+  - multiple keyboards
+  - keyboards over bluetooth
+  - per player sound
+
+grade: stable  # stable or devel
+
+license: GPL-3.0+
+
+base: core18
+
+confinement: strict  # strict, classic or devmode
+
+# The following slots are needed because Gtk uses dbus to
+# ensure that the same application isn't started twice
+# The name must be the same as what is passed to the
+# Gtk::Application::create constructor
+slots:
+  dbus-daemon-jointris:
+    interface: dbus
+    bus: session
+    name: com.efanomars.jointris
+  dbus-daemon-swapper:
+    interface: dbus
+    bus: session
+    name: com.efanomars.swapper
+  dbus-daemon-mynes:
+    interface: dbus
+    bus: session
+    name: com.efanomars.mynes
+  dbus-daemon-btkb:
+    interface: dbus
+    bus: session
+    name: com.efanomars.stmm-input-btkb
+  dbus-daemon-floater:
+    interface: dbus
+    bus: session
+    name: com.efanomars.device-floater
+
+apps:
+  jointris:
+    command: bin/jointris
+    desktop: usr/share/applications/com.efanomars.jointris.desktop
+    extensions: [gnome-3-28]
+    plugs:
+    - network
+    - network-bind
+    - bluetooth-control
+    - bluez
+    - home
+    - joystick
+    - pulseaudio
+    - alsa
+    slots:
+    - dbus-daemon-jointris
+  swapper:
+    command: bin/swapper
+    desktop: usr/share/applications/com.efanomars.swapper.desktop
+    extensions: [gnome-3-28]
+    plugs:
+    - network
+    - network-bind
+    - bluetooth-control
+    - bluez
+    - home
+    - joystick
+    - pulseaudio
+    - alsa
+    slots:
+    - dbus-daemon-swapper
+  mynes:
+    command: bin/mynes
+    desktop: usr/share/applications/com.efanomars.mynes.desktop
+    extensions: [gnome-3-28]
+    plugs:
+    - network
+    - network-bind
+    - bluetooth-control
+    - bluez
+    - home
+    - joystick
+    - pulseaudio
+    - alsa
+    slots:
+    - dbus-daemon-mynes
+  stmm-input-btkb:
+    command: bin/stmm-input-btkb
+    desktop: usr/share/applications/com.efanomars.stmm-input-btkb.desktop
+    extensions: [gnome-3-28]
+    environment:
+      GSETTINGS_SCHEMA_DIR: $SNAP/usr/share/glib-2.0/schemas
+    plugs:
+    - network
+    - network-bind
+    - bluetooth-control
+    - bluez
+    - home
+    - gsettings
+    slots:
+    - dbus-daemon-btkb
+  device-floater:
+    command: bin/device-floater
+    desktop: usr/share/applications/com.efanomars.device-floater.desktop
+    extensions: [gnome-3-28]
+    plugs:
+    - home
+    slots:
+    - dbus-daemon-floater
+  stmm-input-plugins:
+    command: bin/stmm-input-plugins
+    plugs:
+    - home
+
+parts:
+
+  jointris:
+    after:
+      - stmm-games
+    plugin: nil
+    build-environment:
+    - LANG: C.UTF-8   # en_US.UTF-8
+    - LC_ALL: C.UTF-8
+    override-build: |
+      snapcraftctl build
+      wget "https://efanomars.com/games/jointris/"  -O  jointris.html # --quiet
+      RELLINK=$(cat jointris.html \
+                     | grep Tarball \
+                     | sed -n 's/.*Tarball\:.*href="\([^"]*\)">.*/\1/p')
+      ALLLINK="https://efanomars.com${RELLINK}"
+      wget --quiet "${ALLLINK}"
+      TARBALL=$(basename ${ALLLINK})
+      tar mxvzf "${TARBALL}"
+      rm -f jointris.html 2>/dev/null
+      rm -f "${TARBALL}" 2>/dev/null
+      sed -i.bak -e 's|Icon=jointris|Icon=/usr/share/icons/hicolor/scalable/apps/jointris.svg|g' \
+                     ./jointris/jointris/data/applications/com.efanomars.jointris.desktop
+      export STMM_MAKE_OPTIONS=--jobs=6
+      export STMM_SNAP_PACKAGING=ON
+      ./jointris/scripts/priv/dd_install_jointris-all.py -b=Release --installdir=/usr \
+                                                 --destdir=${SNAPCRAFT_PART_INSTALL} \
+                                                 -s=Off -t=Off -d=Off
+      #
+      VERSION=$(date +%Y%m%d%H%M)
+      echo VERSION ${VERSION}
+      snapcraftctl set-version "${VERSION}"
+      #
+    build-packages:
+      - build-essential
+      - cmake
+      - g++
+      - python3
+      - libgtkmm-3.0-dev
+      - libbluetooth-dev
+      - libalure-dev
+      - libxi-dev
+      - libx11-dev
+      - librsvg2-dev
+      - libxml++2.6-dev
+      - wget
+      - sed
+      - grep
+    stage-packages:
+      - libgtkmm-3.0-1v5
+      - libbluetooth3
+      - bluez
+      - libalure1
+      - libxi6
+      - libx11-6
+      - librsvg2-2
+      - libxml++2.6-2v5
+
+  swapper:
+    after:
+      - stmm-games
+    plugin: nil
+    build-environment:
+    - LANG: C.UTF-8   # en_US.UTF-8
+    - LC_ALL: C.UTF-8
+    override-build: |
+      snapcraftctl build
+      wget --quiet "https://efanomars.com/games/swapper/"  -O  swapper.html
+      RELLINK=$(cat swapper.html \
+                     | grep Tarball \
+                     | sed -n "s/^.*Tarball:.*\href=\"\(\S*\)\".https.*$/\1/p")
+      ALLLINK="https://efanomars.com${RELLINK}"
+      wget --quiet "${ALLLINK}"
+      TARBALL=$(basename ${ALLLINK})
+      tar mxvzf "${TARBALL}"
+      rm -f swapper.html 2>/dev/null
+      rm -f "${TARBALL}" 2>/dev/null
+      sed -i.bak -e 's|Icon=swapper|Icon=/usr/share/icons/hicolor/scalable/apps/swapper.svg|g' \
+                     ./swapper/swapper/data/applications/com.efanomars.swapper.desktop
+      export STMM_MAKE_OPTIONS=--jobs=4
+      export STMM_SNAP_PACKAGING=ON
+      ./swapper/scripts/priv/dd_install_swapper-all.py -b=Release --installdir=/usr \
+                                                 --destdir=${SNAPCRAFT_PART_INSTALL} \
+                                                 -s=Off -t=Off -d=Off
+      #
+    build-packages:
+      - build-essential
+      - cmake
+      - g++
+      - python3
+      - libgtkmm-3.0-dev
+      - libbluetooth-dev
+      - libalure-dev
+      - libxi-dev
+      - libx11-dev
+      - librsvg2-dev
+      - libxml++2.6-dev
+      - wget
+      - sed
+      - grep
+    stage-packages:
+      - libgtkmm-3.0-1v5
+      - libbluetooth3
+      - bluez
+      - libalure1
+      - libxi6
+      - libx11-6
+      - librsvg2-2
+      - libxml++2.6-2v5
+
+  mynes:
+    after:
+      - stmm-games
+    plugin: nil
+    build-environment:
+    - LANG: C.UTF-8   # en_US.UTF-8
+    - LC_ALL: C.UTF-8
+    override-build: |
+      snapcraftctl build
+      wget --quiet "https://efanomars.com/games/mynes/"  -O  mynes.html
+      RELLINK=$(cat mynes.html \
+                     | grep Tarball \
+                     | sed -n "s/^.*Tarball:.*\href=\"\(\S*\)\".https.*$/\1/p")
+      ALLLINK="https://efanomars.com${RELLINK}"
+      wget --quiet "${ALLLINK}"
+      TARBALL=$(basename ${ALLLINK})
+      tar mxvzf "${TARBALL}"
+      rm -f mynes.html 2>/dev/null
+      rm -f "${TARBALL}" 2>/dev/null
+      sed -i.bak -e 's|Icon=mynes|Icon=/usr/share/icons/hicolor/scalable/apps/mynes.svg|g' \
+                     ./mynes/mynes/data/applications/com.efanomars.mynes.desktop
+      export STMM_MAKE_OPTIONS=--jobs=4
+      export STMM_SNAP_PACKAGING=ON
+      ./mynes/scripts/priv/dd_install_mynes-all.py -b=Release --installdir=/usr \
+                                                 --destdir=${SNAPCRAFT_PART_INSTALL} \
+                                                 -s=Off -t=Off -d=Off
+      #
+    build-packages:
+      - build-essential
+      - cmake
+      - g++
+      - python3
+      - libgtkmm-3.0-dev
+      - libbluetooth-dev
+      - libalure-dev
+      - libxi-dev
+      - libx11-dev
+      - librsvg2-dev
+      - libxml++2.6-dev
+      - wget
+      - sed
+      - grep
+    stage-packages:
+      - libgtkmm-3.0-1v5
+      - libbluetooth3
+      - bluez
+      - libalure1
+      - libxi6
+      - libx11-6
+      - librsvg2-2
+      - libxml++2.6-2v5
+
+
+  stmm-games:
+    after:
+      - stmm-input-au
+      - stmm-input
+    plugin: nil
+    build-environment:
+    - LANG: C.UTF-8   # en_US.UTF-8
+    - LC_ALL: C.UTF-8
+    override-build: |
+      snapcraftctl build
+      wget --quiet "https://efanomars.com/libraries/stmm-games/"  -O  stmm-games.html
+      RELLINK=$(cat stmm-games.html \
+                     | grep Tarball \
+                     | sed -n "s/^.*Tarball:.*\href=\"\(\S*\)\".https.*$/\1/p")
+      ALLLINK="https://efanomars.com${RELLINK}"
+      wget --quiet "${ALLLINK}"
+      TARBALL=$(basename ${ALLLINK})
+      tar mxvzf "${TARBALL}"
+      rm -f stmm-games.html 2>/dev/null
+      rm -f "${TARBALL}" 2>/dev/null
+      export STMM_MAKE_OPTIONS=--jobs=4
+      export STMM_CPP_DEBUG=ON
+      export STMM_CMAKE_COMMENTS=ON
+      export STMM_SNAP_PACKAGING=ON
+      ./stmm-games/scripts/priv/dd_install_stmm-games-all.py -b=Release --installdir=/usr \
+                                                 --destdir=${SNAPCRAFT_PART_INSTALL} \
+                                                 -s=Off -t=Off -d=Off
+      #
+    build-packages:
+      - build-essential
+      - cmake
+      - g++
+      - python3
+      - libgtkmm-3.0-dev
+      - libxi-dev
+      - libx11-dev
+      - librsvg2-dev
+      - libxml++2.6-dev
+      - wget
+      - sed
+      - grep
+    stage-packages:
+      - libgtkmm-3.0-1v5
+      - libxi6
+      - libx11-6
+      - librsvg2-2
+      - libxml++2.6-2v5
+
+
+  stmm-input-au:
+    after:
+      - stmm-input
+    plugin: nil
+    build-environment:
+    - LANG: C.UTF-8   # en_US.UTF-8
+    - LC_ALL: C.UTF-8
+    override-build: |
+      snapcraftctl build
+      wget --quiet "https://efanomars.com/libraries/stmm-input-au/"  -O  stmm-input-au.html
+      RELLINK=$(cat stmm-input-au.html \
+                     | grep Tarball \
+                     | sed -n "s/^.*Tarball:.*\href=\"\(\S*\)\".https.*$/\1/p")
+      ALLLINK="https://efanomars.com${RELLINK}"
+      wget --quiet "${ALLLINK}"
+      TARBALL=$(basename ${ALLLINK})
+      tar mxvzf "${TARBALL}"
+      rm -f stmm-input-au.html 2>/dev/null
+      rm -f "${TARBALL}" 2>/dev/null
+      export STMM_MAKE_OPTIONS=--jobs=4
+      export STMM_SNAP_PACKAGING=ON
+      ./stmm-input-au/scripts/priv/dd_install_stmm-input-au-all.py -b=Release --installdir=/usr \
+                                                 --destdir=${SNAPCRAFT_PART_INSTALL} \
+                                                 -s=Off -t=Off -d=Off
+      #
+    build-packages:
+      - build-essential
+      - cmake
+      - g++
+      - python3
+      - libglibmm-2.4-dev
+      - libalure-dev
+      - wget
+      - sed
+      - grep
+    stage-packages:
+      - libglibmm-2.4-1v5
+      - libalure1
+      - libvorbisfile3
+      - libsndfile1
+      - libflac8
+      - libmpg123-0
+      - libdumb1
+      - libmodplug1
+      - libfluidsynth1
+      - libgcc1
+
+
+  stmm-input-bt:
+    after:
+      - stmm-input
+    plugin: nil
+    build-environment:
+    - LANG: C.UTF-8   # en_US.UTF-8
+    - LC_ALL: C.UTF-8
+    override-build: |
+      snapcraftctl build
+      wget --quiet "https://efanomars.com/libraries/stmm-input-bt/"  -O  stmm-input-bt.html
+      RELLINK=$(cat stmm-input-bt.html \
+                     | grep Tarball \
+                     | sed -n "s/^.*Tarball:.*\href=\"\(\S*\)\".https.*$/\1/p")
+      ALLLINK="https://efanomars.com${RELLINK}"
+      wget --quiet "${ALLLINK}"
+      TARBALL=$(basename ${ALLLINK})
+      tar mxvzf "${TARBALL}"
+      rm -f stmm-input-bt.html 2>/dev/null
+      rm -f "${TARBALL}" 2>/dev/null
+      sed -i.bak -e 's|Icon=stmm-input-btkb|Icon=/usr/share/icons/hicolor/scalable/apps/stmm-input-btkb.svg|g' \
+                     ./stmm-input-bt/stmm-input-btkb/data/applications/com.efanomars.stmm-input-btkb.desktop
+      export STMM_MAKE_OPTIONS=--jobs=4
+      export STMM_SNAP_PACKAGING=ON
+      ./stmm-input-bt/scripts/priv/dd_install_stmm-input-bt-all.py -b=Release --installdir=/usr \
+                                                 --destdir=${SNAPCRAFT_PART_INSTALL} \
+                                                 -s=Off -t=Off -d=Off
+      #
+    build-packages:
+      - build-essential
+      - cmake
+      - g++
+      - python3
+      - libgtkmm-3.0-dev
+      - libbluetooth-dev
+      - wget
+      - sed
+      - grep
+    stage-packages:
+      - libgtkmm-3.0-1v5
+      - libbluetooth3
+      - bluez
+      - librsvg2-2
+      - libgdk-pixbuf2.0-0
+
+  desktop-settings-build:
+    plugin: nil
+    after: [ stmm-input-bt ]
+    override-prime: |
+      set -eux
+      glib-compile-schemas ${SNAPCRAFT_PRIME}/usr/share/glib-2.0/schemas
+
+
+  stmm-input-xi:
+    after:
+      - stmm-input
+    plugin: nil
+    build-environment:
+    - LANG: C.UTF-8   # en_US.UTF-8
+    - LC_ALL: C.UTF-8
+    override-build: |
+      snapcraftctl build
+      wget --quiet "https://efanomars.com/libraries/stmm-input-xi/"  -O  stmm-input-xi.html
+      RELLINK=$(cat stmm-input-xi.html \
+                     | grep Tarball \
+                     | sed -n "s/^.*Tarball:.*\href=\"\(\S*\)\".https.*$/\1/p")
+      ALLLINK="https://efanomars.com${RELLINK}"
+      wget --quiet "${ALLLINK}"
+      TARBALL=$(basename ${ALLLINK})
+      tar mxvzf "${TARBALL}"
+      rm -f stmm-input-xi.html 2>/dev/null
+      rm -f "${TARBALL}" 2>/dev/null
+      sed -i.bak -e 's|Icon=device-floater|Icon=/usr/share/icons/hicolor/scalable/apps/device-floater.svg|g' \
+                     ./stmm-input-xi/device-floater/data/applications/com.efanomars.device-floater.desktop
+      export STMM_MAKE_OPTIONS=--jobs=4
+      export STMM_SNAP_PACKAGING=ON
+      ./stmm-input-xi/scripts/priv/dd_install_stmm-input-xi-all.py -b=Release --installdir=/usr \
+                                                 --destdir=${SNAPCRAFT_PART_INSTALL} \
+                                                 -s=Off -t=Off -d=Off
+      #
+    build-packages:
+      - build-essential
+      - cmake
+      - g++
+      - python3
+      - libgtkmm-3.0-dev
+      - libxi-dev
+      - libx11-dev
+      - wget
+      - sed
+      - grep
+    stage-packages:
+      - libgtkmm-3.0-1v5
+      - libxi6
+      - libx11-6
+
+
+  stmm-input:
+    plugin: nil
+    build-environment:
+    - LANG: C.UTF-8   # en_US.UTF-8
+    - LC_ALL: C.UTF-8
+    override-build: |
+      snapcraftctl build
+      wget --quiet "https://efanomars.com/libraries/stmm-input/"  -O  stmm-input.html
+      RELLINK=$(cat stmm-input.html \
+                     | grep Tarball \
+                     | sed -n "s/^.*Tarball:.*\href=\"\(\S*\)\".https.*$/\1/p")
+      ALLLINK="https://efanomars.com${RELLINK}"
+      wget --quiet "${ALLLINK}"
+      TARBALL=$(basename ${ALLLINK})
+      tar mxvzf "${TARBALL}"
+      rm -f stmm-input.html 2>/dev/null
+      rm -f "${TARBALL}" 2>/dev/null
+      export STMM_MAKE_OPTIONS=--jobs=4
+      export STMM_SNAP_PACKAGING=ON
+      ./stmm-input/scripts/priv/dd_install_stmm-input-all.py -b=Release --installdir=/usr \
+                                                --destdir=${SNAPCRAFT_PART_INSTALL} -s=Off -t=Off -d=Off
+      #
+    build-packages:
+      - build-essential
+      - cmake
+      - g++
+      - python3
+      - libgtkmm-3.0-dev
+      - wget
+      - sed
+      - grep
+    stage-packages:
+      - libgtkmm-3.0-1v5
+
