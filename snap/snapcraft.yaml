@@ -12,7 +12,7 @@ description: |
   Swapper - Swap tiles to remove them
   Mynes - scrolling minesweeper with sonars and islands
   - joysticks
-  - multiple keyboards
+  - multiple usb keyboards
   - keyboards over bluetooth
   - per player sound
 
@@ -50,6 +50,17 @@ slots:
     bus: session
     name: com.efanomars.device-floater
 
+# The stmm-games-local-dir plug allows to define custom games and themes
+# Ex. jointris games can be stored in folder ~/.local/share/stmm-games/games/jointris
+# Ex. swapper themes can be stored in folder ~/.local/share/stmm-games/themes/swapper
+# The user needs to give permission with
+#  snap connect stmg:stmm-games-local-dir
+plugs:
+  stmm-games-local-dir:
+    interface: personal-files
+    read:
+    - $HOME/.local/share/stmm-games
+
 apps:
   jointris:
     command: bin/jointris
@@ -59,11 +70,9 @@ apps:
     - network
     - network-bind
     - bluetooth-control
-    - bluez
-    - home
     - joystick
-    - pulseaudio
-    - alsa
+    - audio-playback
+    - stmm-games-local-dir
     slots:
     - dbus-daemon-jointris
   swapper:
@@ -74,11 +83,9 @@ apps:
     - network
     - network-bind
     - bluetooth-control
-    - bluez
-    - home
     - joystick
-    - pulseaudio
-    - alsa
+    - audio-playback
+    - stmm-games-local-dir
     slots:
     - dbus-daemon-swapper
   mynes:
@@ -89,11 +96,9 @@ apps:
     - network
     - network-bind
     - bluetooth-control
-    - bluez
-    - home
     - joystick
-    - pulseaudio
-    - alsa
+    - audio-playback
+    - stmm-games-local-dir
     slots:
     - dbus-daemon-mynes
   stmm-input-btkb:
@@ -106,8 +111,6 @@ apps:
     - network
     - network-bind
     - bluetooth-control
-    - bluez
-    - home
     - gsettings
     slots:
     - dbus-daemon-btkb
@@ -115,14 +118,10 @@ apps:
     command: bin/device-floater
     desktop: usr/share/applications/com.efanomars.device-floater.desktop
     extensions: [gnome-3-28]
-    plugs:
-    - home
     slots:
     - dbus-daemon-floater
   stmm-input-plugins:
     command: bin/stmm-input-plugins
-    plugs:
-    - home
 
 parts:
 
