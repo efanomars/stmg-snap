@@ -4,17 +4,17 @@ name: stmg
 
 summary: Bundle containing jointris, swapper and mynes games.
 
-#version: "latest"
-adopt-info: jointris # part setting the version to current time
+version: "latest"
+#adopt-info: set-version-part # part setting the version
 
 description: |
   Jointris - Join blocks on the fly with bombs
   Swapper - Swap tiles to remove them
   Mynes - scrolling minesweeper with sonars and islands
+  Play with:
   - joysticks
   - multiple usb keyboards
   - keyboards over bluetooth
-  - per player sound
 
 grade: stable  # stable or devel
 
@@ -50,13 +50,13 @@ slots:
     bus: session
     name: com.efanomars.device-floater
 
-# The stmm-games-local-dir plug allows to define custom games and themes
+# The dot-local-share-stmm-games plug allows to define custom games and themes
 # Ex. jointris games can be stored in folder ~/.local/share/stmm-games/games/jointris
 # Ex. swapper themes can be stored in folder ~/.local/share/stmm-games/themes/swapper
 # The user needs to give permission with
-#  snap connect stmg:stmm-games-local-dir
+#  snap connect stmg:dot-local-share-stmm-games
 plugs:
-  stmm-games-local-dir:
+  dot-local-share-stmm-games:
     interface: personal-files
     read:
     - $HOME/.local/share/stmm-games
@@ -72,7 +72,7 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    - stmm-games-local-dir
+    - dot-local-share-stmm-games
     slots:
     - dbus-daemon-jointris
   swapper:
@@ -85,7 +85,7 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    - stmm-games-local-dir
+    - dot-local-share-stmm-games
     slots:
     - dbus-daemon-swapper
   mynes:
@@ -98,7 +98,7 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    - stmm-games-local-dir
+    - dot-local-share-stmm-games
     slots:
     - dbus-daemon-mynes
   stmm-input-btkb:
@@ -124,6 +124,17 @@ apps:
     command: bin/stmm-input-plugins
 
 parts:
+
+  #set-version-part:
+    #plugin: nil
+    #override-pull: |
+      #snapcraftctl pull
+
+      #wget "https://efanomars.com/bundles/gamebundle/"  -O  gamebundle.html # --quiet
+      #BUNDLEVERSION=$(cat gamebundle.html \
+                        #| grep "Latest version" \
+                        #| sed -n 's|.*Latest version\:.*\<i\>\([0-9]*\)\</i>.*|\1|p')
+      #snapcraftctl set-version "${BUNDLEVERSION}"
 
   jointris:
     after:
@@ -151,10 +162,6 @@ parts:
       ./jointris/scripts/priv/dd_install_jointris-all.py -b=Release --installdir=/usr \
                                                  --destdir=${SNAPCRAFT_PART_INSTALL} \
                                                  -s=Off -t=Off -d=Off
-      #
-      VERSION=$(date +%Y%m%d%H%M)
-      echo VERSION ${VERSION}
-      snapcraftctl set-version "${VERSION}"
       #
     build-packages:
       - build-essential
