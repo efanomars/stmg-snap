@@ -4,8 +4,8 @@ name: stmg
 
 summary: Bundle containing jointris, swapper and mynes games.
 
-version: "latest"
-#adopt-info: set-version-part # part setting the version
+#version: "latest"
+adopt-info: set-version-part # part setting the version
 
 description: |
   Jointris - Join blocks on the fly with bombs
@@ -125,16 +125,16 @@ apps:
 
 parts:
 
-  #set-version-part:
-    #plugin: nil
-    #override-pull: |
-      #snapcraftctl pull
+  set-version-part:
+    plugin: nil
+    override-pull: |
+      snapcraftctl pull
 
-      #wget "https://efanomars.com/bundles/gamebundle/"  -O  gamebundle.html # --quiet
-      #BUNDLEVERSION=$(cat gamebundle.html \
-                        #| grep "Latest version" \
-                        #| sed -n 's|.*Latest version\:.*\<i\>\([0-9]*\)\</i>.*|\1|p')
-      #snapcraftctl set-version "${BUNDLEVERSION}"
+      wget "https://efanomars.com/bundles/gamebundle/"  -O  gamebundle.html # --quiet
+      BUNDLEVERSION=$(cat gamebundle.html \
+                        | grep "Latest version" \
+                        | sed -n 's|.*Latest version\:.*i>\([0-9]*\)./i>.*|\1|p')
+      snapcraftctl set-version "${BUNDLEVERSION}"
 
   jointris:
     after:
