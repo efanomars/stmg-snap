@@ -1,10 +1,10 @@
-# Official release version from efanomars.con website
+# Official release from the latest sources at https://efanomars.com
+# This file can be found at https://github.com/efanomars/stmg-snap
 
 name: stmg
 
 summary: Bundle containing jointris, swapper and mynes games.
 
-#version: "latest"
 adopt-info: set-version-part # part setting the version
 
 description: |
