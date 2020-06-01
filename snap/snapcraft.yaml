@@ -50,16 +50,16 @@ slots:
     bus: session
     name: com.efanomars.device-floater
 
-# The dot-local-share-stmm-games plug allows to define custom games and themes
-# Ex. jointris games can be stored in folder ~/.local/share/stmm-games/games/jointris
-# Ex. swapper themes can be stored in folder ~/.local/share/stmm-games/themes/swapper
-# The user needs to give permission with
-#  snap connect stmg:dot-local-share-stmm-games
-plugs:
-  dot-local-share-stmm-games:
-    interface: personal-files
-    read:
-    - $HOME/.local/share/stmm-games
+## The dot-local-share-stmm-games plug allows to define custom games and themes
+## Ex. jointris games can be stored in folder ~/.local/share/stmm-games/games/jointris
+## Ex. swapper themes can be stored in folder ~/.local/share/stmm-games/themes/swapper
+## The user needs to give permission with
+##  snap connect stmg:dot-local-share-stmm-games
+#plugs:
+  #dot-local-share-stmm-games:
+    #interface: personal-files
+    #read:
+    #- $HOME/.local/share/stmm-games
 
 apps:
   jointris:
@@ -72,7 +72,8 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    - dot-local-share-stmm-games
+    #- home
+    #- dot-local-share-stmm-games
     slots:
     - dbus-daemon-jointris
   swapper:
@@ -85,7 +86,8 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    - dot-local-share-stmm-games
+    #- home
+    #- dot-local-share-stmm-games
     slots:
     - dbus-daemon-swapper
   mynes:
@@ -98,7 +100,8 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    - dot-local-share-stmm-games
+    #- home
+    #- dot-local-share-stmm-games
     slots:
     - dbus-daemon-mynes
   stmm-input-btkb:
