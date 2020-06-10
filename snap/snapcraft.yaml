@@ -16,6 +16,12 @@ description: |
   - multiple usb keyboards
   - keyboards over bluetooth
 
+architectures:
+  - amd64
+  - arm64
+  - s390x
+  - ppc64el
+
 grade: stable  # stable or devel
 
 license: GPL-3.0+
