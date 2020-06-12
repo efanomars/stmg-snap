@@ -17,11 +17,10 @@ description: |
   - keyboards over bluetooth
 
 architectures:
-  build-on:
-    - amd64
-    - arm64
-    - s390x
-    - ppc64el
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: s390x
+  - build-on: ppc64el
 
 grade: stable  # stable or devel
 
