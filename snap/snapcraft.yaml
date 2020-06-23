@@ -78,7 +78,7 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    #- home
+    - home
     #- dot-local-share-stmm-games
     slots:
     - dbus-daemon-jointris
@@ -92,7 +92,7 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    #- home
+    - home
     #- dot-local-share-stmm-games
     slots:
     - dbus-daemon-swapper
@@ -106,7 +106,7 @@ apps:
     - bluetooth-control
     - joystick
     - audio-playback
-    #- home
+    - home
     #- dot-local-share-stmm-games
     slots:
     - dbus-daemon-mynes
