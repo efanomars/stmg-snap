@@ -139,8 +139,8 @@ parts:
     override-pull: |
       snapcraftctl pull
 
-      wget "https://efanomars.com/bundles/gamebundle/"  -O  gamebundle.html # --quiet
-      BUNDLEVERSION=$(cat gamebundle.html \
+      wget "https://efanomars.com/bundles/stmg/"  -O  stmg.html # --quiet
+      BUNDLEVERSION=$(cat stmg.html \
                         | grep "Latest version" \
                         | sed -n 's|.*Latest version\:.*i>\([0-9]*\)./i>.*|\1|p')
       snapcraftctl set-version "${BUNDLEVERSION}"
